@@ -1,0 +1,15 @@
+{
+  "name": "main-project",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run start-ui\" \"npm run start-api\"",
+    "start-ui": "cd portal-ui && npm start",
+    "start-api": "cd portal-api && dotnet run",
+    "install-ui": "cd portal-ui && npm install",
+    "install-api": "cd portal-api && dotnet restore",
+    "setup": "npm install && npm run install-ui && npm run install-api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

@@ -1,0 +1,60 @@
+<div class="payment-dialog">
+  <h1 mat-dialog-title>{{ getTitle() }}</h1>
+
+  <div mat-dialog-content>
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Reference</mat-label>
+        <input matInput formControlName="Reference" placeholder="Enter payment reference">
+        <mat-error *ngIf="form.get('Reference')?.hasError('required')">
+          Reference is required
+        </mat-error>
+        <mat-error *ngIf="form.get('Reference')?.hasError('minlength')">
+          Reference must be at least 3 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Amount</mat-label>
+        <input matInput formControlName="Amount" placeholder="Enter amount" type="number" step="0.01">
+        <mat-error *ngIf="form.get('Amount')?.hasError('required')">
+          Amount is required
+        </mat-error>
+        <mat-error *ngIf="form.get('Amount')?.hasError('pattern')">
+          Amount must be a valid decimal number
+        </mat-error>
+        <mat-error *ngIf="form.get('Amount')?.hasError('min')">
+          Amount must be greater than 0
+        </mat-error>
+        <mat-error *ngIf="form.get('Amount')?.hasError('max')">
+          Amount cannot exceed 2,147,483,647
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="Currency">
+          <mat-option *ngFor="let currency of currencies" [value]="currency.value">
+            {{ currency.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('Currency')?.hasError('required')">
+          Currency is required
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      *ngIf="mode !== 'view'"
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isLoading">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="spinner"></mat-spinner>
+      {{ getSubmitButtonText() }}
+    </button>
+  </div>
+</div>

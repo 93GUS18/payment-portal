@@ -1,0 +1,84 @@
+<div class="payment-container">
+    <div class="header">
+        <h2>Payments Management</h2>
+        <div class="button-group">
+            <button mat-raised-button color="primary" (click)="refreshData()" [disabled]="isLoading">
+                <mat-icon>refresh</mat-icon>
+                Refresh
+            </button>
+            <button mat-raised-button color="accent" (click)="addPayment()" [disabled]="isLoading">
+                <mat-icon>add</mat-icon>
+                Add Payment
+            </button>
+        </div>
+    </div>
+
+
+
+    <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoading">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+            <!-- Payment ID Column -->
+            <ng-container matColumnDef="Reference">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Reference </th>
+                <td mat-cell *matCellDef="let payment"> {{payment.reference}} </td>
+            </ng-container>
+
+            <!-- Customer Name Column -->
+            <ng-container matColumnDef="Currency">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Currency </th>
+                <td mat-cell *matCellDef="let payment"> {{payment.currency}} </td>
+            </ng-container>
+
+            <!-- Amount Column -->
+            <ng-container matColumnDef="Amount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+                <td mat-cell *matCellDef="let payment"> {{payment.Amount}} </td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="CreatedAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                <td mat-cell *matCellDef="let payment"> {{payment.CreatedAt}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let payment">
+                    <button mat-icon-button color="primary"> //(click)="viewPayment(payment)
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button color="accent"> //(click)="editPayment(payment)
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn"> //(click)="deletePayment(payment)
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.row-highlight]="selectedRow === row">
+                //(click)="onRowClick(row)"
+            </tr>
+
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                    <div class="no-data">
+                        <mat-icon>inbox</mat-icon>
+                        <p>No payment data available</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons
+            aria-label="Select page of payments">
+        </mat-paginator>
+    </div>
+</div>

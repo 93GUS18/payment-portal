@@ -17,6 +17,7 @@ import { of } from 'rxjs';
 import { Payment } from '../../Interface/payment';
 import { ApiResponse } from '../../Interface/api-response';
 import { PaymentCreate, DialogData } from '../payment-create/payment-create';
+import { UtcToLocalPipe } from '../../utc-to-local.pipe';
 import { environment } from '../../../environments/environtment';
 
 const PAYMENT_API_HOST = environment.PAYMENT_API_HOST;
@@ -34,7 +35,8 @@ const PAYMENT_API_HOST = environment.PAYMENT_API_HOST;
     MatButtonModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatMenuModule],
+    MatMenuModule,
+    UtcToLocalPipe],
   templateUrl: './payment-list.html',
   styleUrl: './payment-list.css',
 })

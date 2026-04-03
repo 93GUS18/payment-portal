@@ -53,3 +53,7 @@ dkms.conf
 
 # debug information files
 *.dwo
+/portal-api/obj
+/portal-api/.vs/portal-api
+/.vs
+/portal-api/Properties

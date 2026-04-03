@@ -13,7 +13,7 @@ namespace portal_api.Models.DbModel
         public int Id { get; set; }
 
         [Required]
-        public int Amount { get; set; }
+        public float Amount { get; set; }
 
         [Required]
         public CurrencyEnum Currency { get; set; }

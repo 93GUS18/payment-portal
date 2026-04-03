@@ -55,7 +55,7 @@ export class PaymentCreate {
     this.mode = data.mode;
     this.form = this.fb.group({
       Reference: ['', [Validators.required, Validators.minLength(3)]],
-      Amount: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/), Validators.max(2147483647)]],
+      Amount: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/), Validators.min(0.01), Validators.max(2147483647)]],
       Currency: [1, Validators.required]
     });
 

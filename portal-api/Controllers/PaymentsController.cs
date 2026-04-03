@@ -37,6 +37,22 @@ namespace portal_api.Controllers
             }
         }
 
+        [HttpGet("next-id")]
+        public async Task<ActionResult<Response>> GetNextId()
+        {
+            try
+            {
+                var maxId = await _context.PaymentsDBModel.AsNoTracking().MaxAsync(p => (int?)p.Id) ?? 0;
+                var nextId = maxId + 1;
+
+                return new Response(StatusCodes.Status200OK, "", nextId, "");
+            }
+            catch (Exception ex)
+            {
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the next ID", null, ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetPaymentsDBModel(int id)
         {
@@ -65,6 +81,11 @@ namespace portal_api.Controllers
                 if (id != paymentsDBModel.Id)
                 {
                     return new Response(StatusCodes.Status400BadRequest, "Inccorect payment record", null, "");
+                }
+
+                if (paymentsDBModel.Amount <= 0)
+                {
+                    return new Response(StatusCodes.Status400BadRequest, "Payment amount must be greater than 0", null, "");
                 }
 
                 var existingPayment = await _context.PaymentsDBModel.FindAsync(id);
@@ -104,6 +125,11 @@ namespace portal_api.Controllers
                 if (paymentsDBModel == null)
                 {
                     return new Response(StatusCodes.Status400BadRequest, "Payment data is required", null, "");
+                }
+
+                if (paymentsDBModel.Amount <= 0)
+                {
+                    return new Response(StatusCodes.Status400BadRequest, "Payment amount must be greater than 0", null, "");
                 }
 
                 paymentsDBModel.CreatedAt = DateTime.UtcNow;

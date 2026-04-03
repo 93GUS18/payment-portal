@@ -60,3 +60,5 @@ dkms.conf
 /portal-api/Migrations
 /portal-api/bin/Debug/net8.0
 portal-api/.vs/*
+node_modules/*
+package-lock.json

@@ -133,29 +133,44 @@ export class PaymentList implements OnInit, AfterViewInit {
   }
 
   addPayment() {
-    const nextId = this.dataSource.data.length > 0 ? Math.max(...this.dataSource.data.map(p => p.id)) + 1 : 1;
-    const today = new Date();
-    const dateStr = today.getFullYear() + 
-                    ('0' + (today.getMonth() + 1)).slice(-2) + 
-                    ('0' + today.getDate()).slice(-2);
-    const ref = `PAY-${dateStr}-${nextId.toString().padStart(5, '0')}`;
+    this.isLoading = true;
+    this.http.get<ApiResponse<number>>(PAYMENT_API_HOST + 'api/payments/next-id')
+      .pipe(
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
+        next: (response) => {
+          if (response.statusCode === 200 && response.data) {
+            const nextId = response.data;
+            const today = new Date();
+            const dateStr = today.getFullYear() + 
+                            ('0' + (today.getMonth() + 1)).slice(-2) + 
+                            ('0' + today.getDate()).slice(-2);
+            const ref = `PAY-${dateStr}-${nextId.toString().padStart(5, '0')}`;
 
-    const dialogData: DialogData = {
-      mode: 'create',
-      reference: ref
-    };
+            const dialogData: DialogData = {
+              mode: 'create',
+              reference: ref
+            };
 
-    const dialogRef = this.dialog.open(PaymentCreate, {
-      width: '400px',
-      data: dialogData
-    });
+            const dialogRef = this.dialog.open(PaymentCreate, {
+              width: '400px',
+              data: dialogData
+            });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      if (result && result.success && result.mode === 'create') {
-        this.showSuccess('Payment created successfully!');
-        this.loadPayments();
-      }
-    });
+            dialogRef.afterClosed().subscribe((result: any) => {
+              if (result && result.success && result.mode === 'create') {
+                this.showSuccess('Payment created successfully!');
+                this.loadPayments();
+              }
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error retrieving next ID:', error);
+          this.showError('Failed to create payment. Please try again.');
+        }
+      });
   }
 
   deletePayment(payment: Payment) {

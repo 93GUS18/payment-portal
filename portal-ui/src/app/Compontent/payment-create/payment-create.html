@@ -23,6 +23,9 @@
         <mat-error *ngIf="form.get('Amount')?.hasError('pattern')">
           Amount must be a valid decimal number
         </mat-error>
+        <mat-error *ngIf="form.get('Amount')?.hasError('min')">
+          Amount must be greater than 0
+        </mat-error>
         <mat-error *ngIf="form.get('Amount')?.hasError('max')">
           Amount cannot exceed 2,147,483,647
         </mat-error>

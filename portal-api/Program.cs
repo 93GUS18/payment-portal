@@ -1,6 +1,12 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using portal_api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<portal_apiContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("portal_apiContext") ?? throw new InvalidOperationException("Connection string 'portal_apiContext' not found.")));
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

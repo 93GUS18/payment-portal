@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using portal_api.Data;
 using portal_api.Models.DbModel;
+using portal_api.Models.Model;
 
 namespace portal_api.Controllers
 {
@@ -22,32 +23,17 @@ namespace portal_api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<object>> GetPaymentsDBModel()
+        public async Task<ActionResult<Response>> GetPaymentsDBModel()
         {
             try
             {
                 var payments = await _context.PaymentsDBModel.Where(p => !p.IsDeleted).ToListAsync();
 
-                return Ok(
-                    new
-                    {
-                        statusCode = StatusCodes.Status200OK,
-                        message = "",
-                        data = payments
-                    }
-                );
+                return new Response(StatusCodes.Status200OK, "", payments, "");
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        statusCode = StatusCodes.Status500InternalServerError,
-                        message = "An error occurred while retrieving payments",
-                        error = ex.Message
-                    }
-                );
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while retrieving payments", null, ex.Message);
             }
         }
 
@@ -60,70 +46,37 @@ namespace portal_api.Controllers
 
                 if (paymentsDBModel == null)
                 {
-                    return NotFound(
-                        new
-                        {
-                            statusCode = StatusCodes.Status404NotFound,
-                            message = "Payment record not found"
-                        }
-                    );
+                    return new Response(StatusCodes.Status404NotFound, "Payment record not found", null, "");
                 }
 
-                return Ok(
-                    new
-                    {
-                        statusCode = StatusCodes.Status200OK,
-                        message = "",
-                        data = paymentsDBModel
-                    }
-                 );
+                return new Response(StatusCodes.Status200OK, "", paymentsDBModel, "");
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        statusCode = StatusCodes.Status500InternalServerError,
-                        message = "An error occurred while retrieving the payment",
-                        error = ex.Message
-                    }
-                 );
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the payment", null, ex.Message);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPaymentsDBModel(int id, PaymentsDBModel paymentsDBModel)
+        public async Task<ActionResult<Response>> PutPaymentsDBModel(int id, PaymentsDBModel paymentsDBModel)
         {
             try
             {
                 if (id != paymentsDBModel.Id)
                 {
-                    return BadRequest(new
-                    {
-                        statusCode = StatusCodes.Status400BadRequest,
-                        message = "Inccorect payment record"
-                    });
+                    return new Response(StatusCodes.Status400BadRequest, "Inccorect payment record", null, "");
                 }
 
                 var existingPayment = await _context.PaymentsDBModel.FindAsync(id);
 
                 if (existingPayment == null)
                 {
-                    return NotFound(new
-                    {
-                        statusCode = StatusCodes.Status404NotFound,
-                        message = "Payment record not found"
-                    });
+                    return new Response(StatusCodes.Status404NotFound, "Payment record not found", null, "");
                 }
 
                 if (existingPayment.IsDeleted)
                 {
-                    return BadRequest(new
-                    {
-                        statusCode = StatusCodes.Status400BadRequest,
-                        message = "Cannot update a deleted payment record"
-                    });
+                    return new Response(StatusCodes.Status400BadRequest, "Cannot update a deleted payment record", null, "");
                 }
 
                 paymentsDBModel.UpdatedAt = DateTime.UtcNow;
@@ -135,59 +88,22 @@ namespace portal_api.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new
-                {
-                    statusCode = StatusCodes.Status200OK,
-                    message = "Payment updated successfully",
-                    data = paymentsDBModel
-                });
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PaymentsDBModelExists(id))
-                {
-                    return NotFound(new
-                    {
-                        statusCode = StatusCodes.Status404NotFound,
-                        message = "Payment record not found"
-                    });
-                }
-
-                return StatusCode(
-                    StatusCodes.Status409Conflict, 
-                    new
-                    {
-                        statusCode = StatusCodes.Status409Conflict,
-                        message = "Concurrency conflict: the record has been modified by another user"
-                    }
-                );
+                return new Response(StatusCodes.Status200OK, "Payment updated successfully", paymentsDBModel, "");
             }
             catch (Exception ex)
             {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError, 
-                    new
-                    {
-                        statusCode = StatusCodes.Status500InternalServerError,
-                        message = "An error occurred while updating the payment",
-                        error = ex.Message
-                    }
-                );
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while updating the payment", null, ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<object>> PostPaymentsDBModel(PaymentsDBModel paymentsDBModel)
+        public async Task<ActionResult<Response>> PostPaymentsDBModel(PaymentsDBModel paymentsDBModel)
         {
             try
             {
                 if (paymentsDBModel == null)
                 {
-                    return BadRequest(new
-                    {
-                        statusCode = StatusCodes.Status400BadRequest,
-                        message = "Payment data is required"
-                    });
+                    return new Response(StatusCodes.Status400BadRequest, "Payment data is required", null, "");
                 }
 
                 paymentsDBModel.CreatedAt = DateTime.UtcNow;
@@ -197,49 +113,28 @@ namespace portal_api.Controllers
                 _context.PaymentsDBModel.Add(paymentsDBModel);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetPaymentsDBModel", new { id = paymentsDBModel.Id }, new
-                {
-                    statusCode = StatusCodes.Status201Created,
-                    message = "Payment created successfully",
-                    data = paymentsDBModel
-                });
+                return new Response(StatusCodes.Status201Created, "Payment created successfully", paymentsDBModel, "");
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new
-                {
-                    statusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid payment data provided",
-                    error = ex.InnerException?.Message ?? ex.Message
-                });
+                return new Response(StatusCodes.Status400BadRequest, "Invalid payment data provided", null, ex.InnerException?.Message ?? ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    statusCode = StatusCodes.Status500InternalServerError,
-                    message = "An error occurred while creating the payment",
-                    error = ex.Message
-                });
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while creating the payment", null, ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePaymentsDBModel(int id)
+        public async Task<ActionResult<Response>> DeletePaymentsDBModel(int id)
         {
             try
             {
-                var paymentsDBModel = await _context.PaymentsDBModel
-                    .Where(p => p.Id == id && !p.IsDeleted)
-                    .FirstOrDefaultAsync();
+                var paymentsDBModel = await _context.PaymentsDBModel.Where(p => p.Id == id && !p.IsDeleted).FirstOrDefaultAsync();
 
                 if (paymentsDBModel == null)
                 {
-                    return NotFound(new
-                    {
-                        statusCode = StatusCodes.Status404NotFound,
-                        message = "Payment record not found or already deleted"
-                    });
+                    return new Response(StatusCodes.Status404NotFound, "Payment record not found or already deleted", null, "");
                 }
 
                 paymentsDBModel.IsDeleted = true;
@@ -248,20 +143,11 @@ namespace portal_api.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new
-                {
-                    statusCode = StatusCodes.Status200OK,
-                    message = "Payment deleted successfully"
-                });
+                return new Response(StatusCodes.Status200OK, "Payment deleted successfully", null, "");
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    statusCode = StatusCodes.Status500InternalServerError,
-                    message = "An error occurred while deleting the payment",
-                    error = ex.Message
-                });
+                return new Response(StatusCodes.Status500InternalServerError, "An error occurred while deleting the payment", null, ex.Message);
             }
         }
 

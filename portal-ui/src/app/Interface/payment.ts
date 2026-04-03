@@ -1,9 +1,9 @@
 export interface Payment {
-  Id: number;
-  Amount: string;
-  Currency: number;
-  Reference: string;
-  CreatedAt: Date;
-  UpdatedAt: Date;
-  IsDeleted: boolean;
+  id: number;
+  amount: string;
+  currency: number;
+  reference: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
 }

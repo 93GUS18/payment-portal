@@ -59,3 +59,4 @@ dkms.conf
 /portal-api/Properties
 /portal-api/Migrations
 /portal-api/bin/Debug/net8.0
+portal-api/.vs/*
